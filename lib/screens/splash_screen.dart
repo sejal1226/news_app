@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:lottie/lottie.dart';
 import 'package:news_app/constant/colors.dart';
 import 'package:news_app/login/sign_in.dart';
@@ -14,7 +15,14 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   _getData() async {
-    Get.offAll(()=> const SignIn());
+    GetStorage storage = GetStorage();
+    print(storage.read("name"));
+    if(storage.read("name")!=null){
+      Get.offAll(()=> const HomeScreen());
+    }else{
+      Get.offAll(()=> const SignIn());
+    }
+
   }
 
   @override
