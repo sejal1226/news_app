@@ -55,6 +55,12 @@ class _FillDetailsState extends State<FillDetails> {
                     SizedBox(
                       height: 20.h,
                     ),
+                    getTextField(
+                        hintText: "Enter your Mobile Number",
+                        controller: controller.mobileController),
+                    SizedBox(
+                      height: 20.h,
+                    ),
                     Center(
                       child: ButtonTheme(
                         buttonColor: buttonColor,
@@ -62,7 +68,7 @@ class _FillDetailsState extends State<FillDetails> {
                             onPressed: () {
                               controller.validateDetails();
                             },
-                            child: const Text("Log In")),
+                            child: const Text("Sign Up")),
                       ),
                     )
                   ],

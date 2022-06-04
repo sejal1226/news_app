@@ -2,11 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:news_app/constant/colors.dart';
-import 'package:news_app/controller/home_controller.dart';
-import 'package:news_app/controller/login_controller.dart';
-import 'package:news_app/screens/registration_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:news_app/constant/colors.dart';
+import 'package:news_app/controller/login_controller.dart';
+import 'package:news_app/myutils/my_utils.dart';
+import 'package:news_app/screens/otp_screen.dart';
+import 'package:news_app/screens/registration_screen.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -46,7 +47,7 @@ class _SignInState extends State<SignIn> {
                 Row(
                   children: [
                     Text(
-                      "Already have an account? ",
+                      "Don't have an account? ",
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
@@ -58,7 +59,7 @@ class _SignInState extends State<SignIn> {
                         Get.to(() => const FillDetails());
                       },
                       child: Text(
-                        "Login",
+                        "SignUp",
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w700,
@@ -108,7 +109,8 @@ class _SignInState extends State<SignIn> {
                   width: double.infinity,
                   child: TextButton(
                       onPressed: () async {
-                      await signInWithGoogle();
+                        await signInWithGoogle();
+                        setState(() {});
                       },
                       style: ButtonStyle(
                         side: MaterialStateProperty.all(
@@ -204,22 +206,29 @@ class _SignInState extends State<SignIn> {
                 SizedBox(
                   height: 16.h,
                 ),
-                Wrap(
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "By Signing up to Masterminds you agree to our ",
+                      "By Signing up to Breaking News you agree to our ",
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         color: lightTextColor,
                       ),
                     ),
-                    Text(
-                      "Terms and Conditions",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w700,
-                        color: buttonColor,
+                    TextButton(
+                      onPressed: () {
+                        //policy page will be navigate here
+                      },
+                      child: Text(
+                        "Terms and Conditions",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                          color: buttonColor,
+                        ),
                       ),
                     ),
                   ],
@@ -230,8 +239,10 @@ class _SignInState extends State<SignIn> {
                 SizedBox(
                   width: double.infinity,
                   child: TextButton(
-                      onPressed: () {
-                        Get.to(() => FillDetails());
+                      onPressed: () async {
+                        MyUtils.showLoading();
+                        Get.back();
+                        await navigateToOtpScreen();
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(buttonColor),
@@ -242,7 +253,7 @@ class _SignInState extends State<SignIn> {
                         textStyle: MaterialStateProperty.all(TextStyle(
                             fontSize: 14.sp, fontWeight: FontWeight.w700)),
                       ),
-                      child: const Text("Create Account")),
+                      child: const Text("Login")),
                 ),
                 SizedBox(
                   height: 16.h,
@@ -257,6 +268,8 @@ class _SignInState extends State<SignIn> {
 
   Widget getTextField({required controller}) {
     return TextField(
+      maxLength: 10,
+      keyboardType: TextInputType.phone,
       controller: controller,
       decoration: InputDecoration(
           hintText: "Sign up with Mobile Number",
@@ -283,13 +296,13 @@ class _SignInState extends State<SignIn> {
     );
   }
 
-
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
 
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
@@ -299,5 +312,24 @@ class _SignInState extends State<SignIn> {
 
     // Once signed in, return the UserCredential
     return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  navigateToOtpScreen() async {
+    if (controller.mobileController.text.trim().isEmpty) {
+      MyUtils.showErrorSnackBar('Please enter your mobile number');
+    } else if (controller.mobileController.text.trim().length != 10 ||
+        !controller.mobileController.text.isPhoneNumber) {
+      MyUtils.showWarningSnackBar('Mobile Number is Invalid');
+    } else if (!await controller.validateMobile()) {
+      MyUtils.showInfoSnackBar('Mobile Does not Exist');
+    } else {
+      MyUtils.showLoading();
+      controller.insertOtp().whenComplete(() {
+        Get.back();
+        Get.to(() => const OTPScreen(
+              isLoginScreen: true,
+            ));
+      });
+    }
   }
 }

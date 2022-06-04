@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:news_app/screens/splash_screen.dart';
 
-void main() {
+Future<void> main()async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

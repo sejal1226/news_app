@@ -8,14 +8,14 @@ class MyUtils {
         title: 'Please Wait',
         radius: 15,
         titleStyle: const TextStyle(
-            color: purpleColor,
+            color: buttonColor,
             fontWeight: FontWeight.bold
         ),
         content: Row(
           children: const [
             CircularProgressIndicator(
               strokeWidth: 2,
-              color: purpleColor,),
+              color: buttonColor,),
             SizedBox(width: 20,),
             Text('Loading...',
               style: TextStyle(
@@ -30,14 +30,14 @@ class MyUtils {
   }
 
   static void showInfoSnackBar( String message){
-    Get.snackbar("Info" ,message);
+    Get.snackbar("Info" ,message,backgroundColor: Colors.white);
   }
 
   static void showWarningSnackBar( String message){
-    Get.snackbar("Warning", message,);
+    Get.snackbar("Warning", message,backgroundColor: Colors.white);
   }
 
   static void showSuccessSnackBar( String message){
-    Get.snackbar("Success" , message );
+    Get.snackbar("Success" , message,backgroundColor: Colors.white);
   }
 }
